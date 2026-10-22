@@ -1,0 +1,27 @@
+# Compiled class files
+bin/
+*.class
+
+# IDE and Editor configurations
+.vscode/
+.idea/
+*.iml
+*.project
+*.classpath
+*.settings/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Output receipts and test artifacts
+receipts/*.pdf
+receipts/*.txt
+!receipts/.gitkeep
+test_receipts/
+*.log
+
+# Database files
+*.db
+*.sqlite
