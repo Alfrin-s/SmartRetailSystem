@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Retail Inventory & Billing System - Project Architecture & Viva Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 18mm 16mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #04151F;
+    background-color: #FFFFFF;
+    line-height: 1.55;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Palette definitions */
+  :root {
+    --primary: #04151F;
+    --secondary: #183A37;
+    --accent: #C44900;
+    --bg-cream: #FAF7F2;
+    --border-light: #E0D9CE;
+    --badge-ok: #2E7D32;
+    --badge-low: #EF6C00;
+    --badge-out: #C62828;
+  }
+
+  .cover-card {
+    background: linear-gradient(135deg, #04151F 0%, #183A37 100%);
+    color: #FFFFFF;
+    padding: 32px 28px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border-bottom: 5px solid #C44900;
+  }
+
+  .cover-card h1 {
+    font-size: 23pt;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+    color: #FFFFFF;
+  }
+
+  .cover-card .subtitle {
+    font-size: 12.5pt;
+    color: #EFD6AC;
+    margin: 0 0 16px 0;
+    font-weight: 500;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(239, 214, 172, 0.3);
+    font-size: 9pt;
+  }
+
+  .meta-item strong {
+    display: block;
+    color: #EFD6AC;
+    text-transform: uppercase;
+    font-size: 7.5pt;
+    letter-spacing: 0.5px;
+  }
+
+  h2 {
+    color: #04151F;
+    border-bottom: 2px solid #183A37;
+    padding-bottom: 6px;
+    margin-top: 28px;
+    margin-bottom: 14px;
+    font-size: 15pt;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    color: #183A37;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-size: 12pt;
+    page-break-after: avoid;
+  }
+
+  h4 {
+    color: #C44900;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-size: 10.5pt;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin: 0 0 10px 0;
+  }
+
+  .card {
+    background: #FAF7F2;
+    border: 1px solid #E0D9CE;
+    border-left: 4px solid #183A37;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+
+  .card.accent {
+    border-left-color: #C44900;
+  }
+
+  .card.primary {
+    border-left-color: #04151F;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+  }
+
+  th {
+    background: #183A37;
+    color: #FFFFFF;
+    text-align: left;
+    padding: 8px 10px;
+    font-weight: 600;
+    border: 1px solid #183A37;
+  }
+
+  td {
+    padding: 7px 10px;
+    border: 1px solid #E0D9CE;
+    background: #FFFFFF;
+  }
+
+  tr:nth-child(even) td {
+    background: #FAF7F2;
+  }
+
+  code {
+    font-family: "Cascadia Code", "Consolas", "Courier New", monospace;
+    background: #F1EDE4;
+    color: #04151F;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 9pt;
+  }
+
+  pre {
+    background: #04151F;
+    color: #EFD6AC;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-family: "Cascadia Code", "Consolas", "Courier New", monospace;
+    font-size: 8.5pt;
+    line-height: 1.45;
+    overflow-x: auto;
+    margin: 10px 0 14px 0;
+    page-break-inside: avoid;
+    border-left: 4px solid #C44900;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 8pt;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .badge-ok { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+  .badge-low { background: #FFF3E0; color: #EF6C00; border: 1px solid #FFCC80; }
+  .badge-out { background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; }
+
+  .qa-block {
+    margin-bottom: 16px;
+    page-break-inside: avoid;
+    border-bottom: 1px dashed #D3C9BC;
+    padding-bottom: 12px;
+  }
+
+  .qa-q {
+    font-weight: 700;
+    color: #04151F;
+    font-size: 10.5pt;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .qa-q::before {
+    content: "Q";
+    background: #183A37;
+    color: #FFFFFF;
+    font-size: 8pt;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-right: 8px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .qa-q.accent::before {
+    background: #C44900;
+  }
+
+  .qa-a {
+    color: #24292E;
+    font-size: 10pt;
+    line-height: 1.5;
+    padding-left: 28px;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  ul, ol {
+    margin: 6px 0 10px 0;
+    padding-left: 22px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  .footer-note {
+    font-size: 8pt;
+    color: #6C757D;
+    text-align: center;
+    margin-top: 24px;
+    border-top: 1px solid #E0D9CE;
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER / HEADER BLOCK -->
+<div class="cover-card">
+  <h1>Smart Retail Inventory & Billing System</h1>
+  <div class="subtitle">Complete Technical Architecture, Function Guide & Viva Examination Manual</div>
+  <p style="margin: 0; color: #E0E0E0; font-size: 9.5pt;">
+    A full-scale desktop Point-of-Sale (POS) and inventory management platform built entirely with pure Java (JDK 17+), Java Swing, JDBC, and MySQL 8.x, enforcing MVC separation, ACID transactions, and Role-Based Access Control.
+  </p>
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Language</strong>Java (JDK 17+)</div>
+    <div class="meta-item"><strong>UI Framework</strong>Java Swing & Java 2D</div>
+    <div class="meta-item"><strong>Database Engine</strong>MySQL 8.x (JDBC)</div>
+    <div class="meta-item"><strong>Architecture</strong>Strict MVC & DAO</div>
+  </div>
+</div>
+
+<!-- SECTION 1: ARCHITECTURE OVERVIEW -->
+<h2>1. System Overview & MVC Architecture</h2>
+
+<p>
+The application follows the industry-standard <strong>Model-View-Controller (MVC)</strong> architectural pattern paired with the <strong>Data Access Object (DAO)</strong> design pattern. This architecture completely decouples visual presentation from business logic and database persistence, preventing spaghetti code and eliminating SQL queries from Swing UI action listeners.
+</p>
+
+<div class="card primary">
+  <h4 style="margin-top:0;">Architectural Layer Flow</h4>
+  <p style="margin-bottom:6px;"><strong>User Interaction Flow:</strong></p>
+  <p style="font-family: monospace; font-size: 9pt; margin: 0; line-height: 1.6;">
+    [ User / Cashier / Admin ] <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│ (Mouse clicks, barcode scanning, keyboard input)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <strong>VIEW LAYER</strong> (Java Swing: Frames, Panels, Tables, Dialogs)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│ (Fires Controller action methods; receives rendered DTO models)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <strong>CONTROLLER LAYER</strong> (Orchestrators: BillingController, ProductController, etc.)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│ (Executes validation, orchestrates transactions, calculates math)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <strong>MODEL LAYER</strong> (Pure POJOs: Product, Bill, BillItem, User, Inventory)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│ (Represents state and domain business constraints)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <strong>DAO LAYER</strong> (Data Access Objects: BillDAO, ProductDAO, UserDAO)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│ (PreparedStatement queries, connection lifecycle, ACID rollback)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <strong>DATABASE ENGINE</strong> (MySQL 8.x on Port 3306 via Connector/J)
+  </p>
+</div>
+
+<!-- SECTION 2: CLASS BY CLASS DIRECTORY -->
+<div class="page-break"></div>
+<h2>2. Complete Class-by-Class Reference</h2>
+
+<p>The codebase is organized into cleanly separated packages under <code>src/</code>:</p>
+
+<h3>A. Domain Models (<code>src/model/</code>)</h3>
+<table>
+  <thead>
+    <tr><th style="width:25%;">Class Name</th><th style="width:25%;">Extends / Implements</th><th>Responsibility & Business Logic</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>BaseEntity</code></td>
+      <td><em>Abstract Base</em></td>
+      <td>Common foundation for all models. Encapsulates <code>id</code>, <code>createdAt</code>, and <code>updatedAt</code> timestamps with strict getters and setters.</td>
+    </tr>
+    <tr>
+      <td><code>User</code></td>
+      <td><code>BaseEntity</code></td>
+      <td>Represents system operators. Stores <code>username</code>, <code>password</code>, <code>fullName</code>, <code>role</code> (<code>ADMIN</code> or <code>CASHIER</code>), and <code>isActive</code> status.</td>
+    </tr>
+    <tr>
+      <td><code>Product</code></td>
+      <td><code>BaseEntity</code></td>
+      <td>Catalog domain object. Stores <code>barcode</code>, <code>name</code>, <code>category</code>, <code>costPrice</code>, <code>sellingPrice</code>, <code>stockQuantity</code>, and <code>minStockAlert</code>. Validates non-negative prices.</td>
+    </tr>
+    <tr>
+      <td><code>Inventory</code></td>
+      <td><code>BaseEntity</code></td>
+      <td>Warehouse monitoring model. Calculates stock deficits and evaluates badge health (<code>OK</code>, <code>LOW STOCK</code>, <code>OUT OF STOCK</code>).</td>
+    </tr>
+    <tr>
+      <td><code>Bill</code></td>
+      <td><code>BaseEntity</code></td>
+      <td>Invoice transaction header. Encapsulates <code>billNumber</code>, <code>cashierId</code>, <code>customerPhone</code>, <code>subtotal</code>, <code>taxRate</code> (8%), <code>taxAmount</code>, <code>grandTotal</code>, <code>paymentMethod</code>, and the list of line items.</td>
+    </tr>
+    <tr>
+      <td><code>BillItem</code></td>
+      <td><code>BaseEntity</code></td>
+      <td>Individual invoice line in a cart. Tracks <code>productId</code>, <code>productName</code>, <code>quantity</code>, <code>unitPrice</code>, and calculated <code>totalPrice</code>.</td>
+    </tr>
+    <tr>
+      <td><code>SalesReport</code></td>
+      <td>—</td>
+      <td>Aggregated metric container used for executive KPIs and charts (gross revenue, transaction volume, best-selling products).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>B. Data Access Objects (<code>src/dao/</code>)</h3>
+<table>
+  <thead>
+    <tr><th style="width:25%;">Class Name</th><th style="width:25%;">Extends / Implements</th><th>Database Responsibilities</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>BaseDAO</code></td>
+      <td><em>Abstract Base</em></td>
+      <td>Acquires JDBC connections from <code>DatabaseConnection</code>. Implements centralized, safe resource cleanup for <code>ResultSet</code>, <code>Statement</code>, and <code>Connection</code>.</td>
+    </tr>
+    <tr>
+      <td><code>UserDAO</code></td>
+      <td><code>BaseDAO</code></td>
+      <td>Authenticates operators with <code>SELECT * FROM users WHERE username = ? AND password = ? AND is_active = 1</code>. Handles staff CRUD.</td>
+    </tr>
+    <tr>
+      <td><code>ProductDAO</code></td>
+      <td><code>BaseDAO</code></td>
+      <td>CRUD operations for products, live barcode scanner lookup, keyword search, and low-stock filtering queries.</td>
+    </tr>
+    <tr>
+      <td><code>BillDAO</code></td>
+      <td><code>BaseDAO</code></td>
+      <td><strong>Executes ACID checkout transactions</strong>. Manages <code>conn.setAutoCommit(false)</code>, inserts bill headers and item details, deducts stock atomically, and executes <code>conn.rollback()</code> upon any failure.</td>
+    </tr>
+    <tr>
+      <td><code>ReportDAO</code></td>
+      <td><code>BaseDAO</code></td>
+      <td>Runs aggregate SQL queries (<code>SUM</code>, <code>COUNT</code>, <code>DATE_SUB</code>, <code>GROUP BY</code>) for today's sales, weekly trends, and historical monthly summaries.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>C. Controllers (<code>src/controller/</code>)</h3>
+<table>
+  <thead>
+    <tr><th style="width:25%;">Class Name</th><th>Workflow & Orchestration Responsibility</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>LoginController</code></td>
+      <td>Validates credentials, invokes <code>UserDAO</code>, stores the authenticated session, and routes the user to the Admin or Cashier dashboard.</td>
+    </tr>
+    <tr>
+      <td><code>ProductController</code></td>
+      <td>Validates catalog form inputs, delegates CRUD operations to <code>ProductDAO</code>, and refreshes the product table.</td>
+    </tr>
+    <tr>
+      <td><code>InventoryController</code></td>
+      <td>Handles restock requests, applies stock threshold rules, and updates inventory monitors.</td>
+    </tr>
+    <tr>
+      <td><code>BillingController</code></td>
+      <td>Core POS engine. Manages cart state, validates live stock prior to adding items, computes Subtotal + 8% GST + Grand Total, and triggers atomic checkout.</td>
+    </tr>
+    <tr>
+      <td><code>ReportController</code></td>
+      <td>Retrieves analytics data and feeds it to KPI cards and the custom Java 2D bar chart.</td>
+    </tr>
+    <tr>
+      <td><code>UserController</code></td>
+      <td>Manages staff account creation, role assignments, and status toggles.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+<h3>D. View Layer (<code>src/view/</code>)</h3>
+<table>
+  <thead>
+    <tr><th style="width:25%;">Class Name</th><th style="width:20%;">Swing Component</th><th>UI Responsibilities</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>LoginFrame</code></td>
+      <td><code>JFrame</code></td>
+      <td>Centered authentication window with custom styled inputs, password masking, and role validation feedback.</td>
+    </tr>
+    <tr>
+      <td><code>AdminDashboard</code></td>
+      <td><code>JFrame</code></td>
+      <td>Manager portal featuring a collapsible sidebar drawer, live operator profile display, and <code>CardLayout</code> navigation.</td>
+    </tr>
+    <tr>
+      <td><code>CashierDashboard</code></td>
+      <td><code>JFrame</code></td>
+      <td>Streamlined station for billing operators, locked exclusively to the POS billing module.</td>
+    </tr>
+    <tr>
+      <td><code>DashboardHomePanel</code></td>
+      <td><code>JPanel</code></td>
+      <td>Executive overview showing 4 KPI cards (Daily Sales, Invoices, Low Stock Alerts, Total Products) and recent orders.</td>
+    </tr>
+    <tr>
+      <td><code>ProductPanel</code></td>
+      <td><code>JPanel</code></td>
+      <td>Catalog manager with live search filtering, pagination/tables, and add/edit forms.</td>
+    </tr>
+    <tr>
+      <td><code>InventoryPanel</code></td>
+      <td><code>JPanel</code></td>
+      <td>Stock health dashboard with low-stock quick filters and a quick-restock modal dialog.</td>
+    </tr>
+    <tr>
+      <td><code>BillingPanel</code></td>
+      <td><code>JPanel</code></td>
+      <td>Two-column POS terminal: live catalog search on left, shopping cart and payment summary on right.</td>
+    </tr>
+    <tr>
+      <td><code>ReceiptDialog</code></td>
+      <td><code>JDialog</code></td>
+      <td>Simulated 58mm thermal receipt preview modal with PDF and TXT export actions.</td>
+    </tr>
+    <tr>
+      <td><code>ReportsPanel</code></td>
+      <td><code>JPanel</code></td>
+      <td>Analytics screen supporting daily, weekly, and monthly views with an embedded Java 2D chart.</td>
+    </tr>
+    <tr>
+      <td><code>SalesBarChartPanel</code></td>
+      <td><code>JPanel</code></td>
+      <td>Custom component overriding <code>paintComponent(Graphics g)</code> to draw an anti-aliased 2D vertical bar chart.</td>
+    </tr>
+    <tr>
+      <td><code>StockStatusCellRenderer</code></td>
+      <td><code>TableCellRenderer</code></td>
+      <td>Custom renderer painting color-coded badges for stock health inside table cells.</td>
+    </tr>
+    <tr>
+      <td><code>UserPanel</code></td>
+      <td><code>JPanel</code></td>
+      <td>Staff administration panel for managing system operators.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>E. Utilities & Infrastructure (<code>src/util/</code>)</h3>
+<table>
+  <thead>
+    <tr><th style="width:25%;">Class Name</th><th>Design Pattern / Purpose</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DatabaseConnection</code></td>
+      <td><strong>Singleton Pattern</strong>. Manages JDBC connections, auto-creates the MySQL database on port 3306, and bootstraps schema and seed data.</td>
+    </tr>
+    <tr>
+      <td><code>UIStyleUtil</code></td>
+      <td><strong>Factory Pattern</strong>. Enforces the Coolors palette (<code>#04151F</code>, <code>#183A37</code>, <code>#EFD6AC</code>, <code>#C44900</code>) across buttons, tables, text fields, and cards.</td>
+    </tr>
+    <tr>
+      <td><code>ValidationUtil</code></td>
+      <td>Static validation helpers for currency, quantities, barcodes, phone numbers, and mandatory inputs.</td>
+    </tr>
+    <tr>
+      <td><code>ReceiptExporter</code></td>
+      <td><strong>Strategy Pattern</strong>. Defines an interface with two implementations: <code>TextExporter</code> (.txt) and a pure Java <code>PdfExporter</code> (.pdf) without third-party dependencies.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECTION 3: HOW EACH CORE FUNCTION WORKS -->
+<div class="page-break"></div>
+<h2>3. How Each Core Function Operates (Java Workflows)</h2>
+
+<div class="card">
+  <h3 style="margin-top:0;">1. Self-Healing Bootstrapping & Automatic Schema Setup</h3>
+  <p>
+    When <code>Main.main()</code> executes, it triggers <code>DatabaseConnection.initializeDatabase()</code>. The method connects to MySQL root (<code>jdbc:mysql://localhost:3306/</code>) without targeting a database name. It executes <code>CREATE DATABASE IF NOT EXISTS smart_retail</code>, switches the JDBC connection URL to <code>jdbc:mysql://localhost:3306/smart_retail</code>, and builds tables from <code>resources/schema.sql</code>. If the tables are newly initialized, it inserts default administrative credentials and sample catalog items.
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">2. Role-Based Access Control (RBAC) Routing</h3>
+  <p>
+    Upon submitting credentials in <code>LoginFrame</code>, <code>LoginController.handleLogin()</code> calls <code>UserDAO.authenticate(user, pass)</code>. If valid, the returned <code>User</code> instance is inspected for role authorization. If <code>ADMIN</code>, the full <code>AdminDashboard</code> loads; if <code>CASHIER</code>, the restricted <code>CashierDashboard</code> launches. Administrative buttons and navigation panels are not rendered for cashier accounts, enforcing defense-in-depth.
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">3. POS Cart Operations & Real-time Tax Mathematics</h3>
+  <p>
+    When a barcode is entered or a product is selected in <code>BillingPanel</code>, <code>BillingController.addItemToCart()</code> queries the active catalog. If <code>currentStock &lt; requestedQuantity</code>, an error dialog blocks addition. Otherwise, the item is added to the cart's <code>DefaultTableModel</code>. On every modification, <code>calculateTotals()</code> executes:
+  </p>
+  <pre>
+Subtotal    = Σ (selling_price × quantity)
+Tax (8% GST) = Subtotal × 0.08
+Grand Total = Subtotal + Tax</pre>
+</div>
+
+<div class="card accent">
+  <h3 style="margin-top:0; color:#C44900;">4. ACID Transaction Checkout with Rollback Protection</h3>
+  <p>
+    The most critical method in the system is <code>BillDAO.createBillWithItems()</code>. It executes all checkout steps within an explicit atomic transaction:
+  </p>
+  <pre>
+Connection conn = DatabaseConnection.getConnection();
+conn.setAutoCommit(false); // Enable ACID manual transaction mode
+try {
+    // Phase 1: Re-verify stock lock for every item
+    for (BillItem item : bill.getItems()) {
+        int liveStock = queryCurrentStock(conn, item.getProductId());
+        if (liveStock &lt; item.getQuantity()) {
+            throw new SQLException("Insufficient stock: " + item.getProductName());
+        }
+    }
+    // Phase 2: Insert invoice header into `bills`
+    int billId = executeInsertBill(conn, bill);
+
+    // Phase 3: Insert items into `bill_items` and deduct product inventory
+    for (BillItem item : bill.getItems()) {
+        executeInsertBillItem(conn, billId, item);
+        executeDecrementStock(conn, item.getProductId(), item.getQuantity());
+    }
+
+    conn.commit(); // Transaction succeeds: all modifications applied simultaneously
+} catch (Exception ex) {
+    conn.rollback(); // Transaction failed: every insert and stock deduction is completely undone!
+    throw ex;
+} finally {
+    conn.setAutoCommit(true); // Restore default connection state
+}</pre>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">5. Custom Java 2D Graphics Engine (Sales Bar Chart)</h3>
+  <p>
+    Rather than requiring heavy external libraries like JFreeChart, <code>SalesBarChartPanel</code> extends <code>JPanel</code> and overrides <code>paintComponent(Graphics g)</code>. It casts to <code>Graphics2D</code>, turns on <code>RenderingHints.KEY_ANTIALIASING</code>, determines the highest sales value in the dataset, dynamically computes coordinate scaling ratios, draws the axes and grid lines, and renders vertical rectangles colored with <code>#C44900</code> (Rust) and <code>#183A37</code> (Pine) with numeric text tags centered above each bar.
+  </p>
+</div>
+
+<!-- SECTION 4: VIVA QUESTIONS AND ANSWERS -->
+<div class="page-break"></div>
+<h2>4. Comprehensive Viva Examination Questions & Answers</h2>
+
+<h3>Category 1: Object-Oriented Programming (OOP) Principles</h3>
+
+<div class="qa-block">
+  <div class="qa-q">How is Encapsulation demonstrated in this project?</div>
+  <div class="qa-a">
+    Encapsulation is implemented by keeping all class member variables <code>private</code> across domain models (e.g., <code>Product</code>, <code>User</code>, <code>Bill</code>) and providing controlled access via public getters and setters. Setters enforce validation logic—for example, <code>Product.setSellingPrice(double price)</code> checks that the price is strictly positive, preventing invalid state mutations.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">Where is Inheritance used, and what architectural benefit does it provide?</div>
+  <div class="qa-a">
+    Inheritance is used in two key hierarchies:
+    <ul>
+      <li><code>BaseEntity</code>: Inherited by <code>User</code>, <code>Product</code>, <code>Bill</code>, and <code>BillItem</code>. It provides shared fields (<code>id</code>, <code>createdAt</code>, <code>updatedAt</code>) and standardizes lifecycle metadata.</li>
+      <li><code>BaseDAO</code>: Inherited by <code>UserDAO</code>, <code>ProductDAO</code>, <code>BillDAO</code>, and <code>ReportDAO</code>. It provides centralized connection management and safe resource teardown methods (<code>close()</code>).</li>
+    </ul>
+    This avoids code duplication and enforces structural consistency across the application.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">How does your project use Polymorphism?</div>
+  <div class="qa-a">
+    Polymorphism is demonstrated via the <strong>Strategy Pattern</strong> in <code>ReceiptExporter</code>. The interface defines <code>File export(Bill bill, File dir)</code>, which is implemented polymorphically by <code>TextExporter</code> and <code>PdfExporter</code>. The calling view invokes the shared interface method without needing to know which exporter format is active. Polymorphism is also utilized in <code>StockStatusCellRenderer</code>, which overrides Swing's <code>getTableCellRendererComponent()</code> to dynamically customize cell styling based on row data.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">How is Abstraction implemented in the persistence layer?</div>
+  <div class="qa-a">
+    Abstraction hides complex low-level details. The View and Controller layers do not know whether the system uses MySQL, Oracle, or files; they simply interact with DAO abstract contracts like <code>productDAO.findById(id)</code>. All JDBC connections, SQL syntax, driver loading, and <code>ResultSet</code> parsing are abstracted inside the DAO layer.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">Why did you use the MVC pattern instead of placing database queries directly inside button action listeners?</div>
+  <div class="qa-a">
+    Putting SQL queries inside Swing event listeners couples presentation directly with data storage, making the system difficult to maintain, test, or update. MVC enforces <strong>Separation of Concerns</strong>:
+    <ul>
+      <li><strong>View</strong> only renders GUI elements and captures user gestures.</li>
+      <li><strong>Controller</strong> processes logic, enforces validation, and handles navigation.</li>
+      <li><strong>Model</strong> holds state and business constraints.</li>
+      <li><strong>DAO</strong> manages data persistence.</li>
+    </ul>
+    This modularity allows modifying the database schema or swapping the UI without breaking business logic.
+  </div>
+</div>
+
+<div class="page-break"></div>
+<h3>Category 2: Database, JDBC & ACID Transactions</h3>
+
+<div class="qa-block">
+  <div class="qa-q accent">What are ACID properties, and how does your project guarantee them?</div>
+  <div class="qa-a">
+    ACID ensures reliable database transaction processing:
+    <ul>
+      <li><strong>Atomicity:</strong> All-or-nothing execution. In <code>BillDAO.createBillWithItems()</code>, inserting the bill header, adding cart line items, and deducting inventory stock happen together. If any operation fails, <code>conn.rollback()</code> reverts all changes.</li>
+      <li><strong>Consistency:</strong> Database constraints (foreign keys, non-negative stock checks) are preserved before and after each transaction.</li>
+      <li><strong>Isolation:</strong> MySQL's InnoDB engine ensures concurrent transactions execute independently without dirty reads.</li>
+      <li><strong>Durability:</strong> Once <code>conn.commit()</code> completes, the transaction is written to MySQL's redo log and persists across power failures or crashes.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q accent">Why is <code>conn.setAutoCommit(false)</code> required in billing checkout?</div>
+  <div class="qa-a">
+    By default, JDBC operates in auto-commit mode (every individual SQL statement commits immediately). If the bill header were inserted and the system crashed before stock deduction, inventory counts would be corrupted. Calling <code>conn.setAutoCommit(false)</code> groups all operations into a single logical transaction, ensuring manual control over <code>commit()</code> or <code>rollback()</code>.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">How does your code prevent SQL Injection attacks?</div>
+  <div class="qa-a">
+    Every query throughout all DAOs strictly utilizes <code>java.sql.PreparedStatement</code> with parameterized placeholders (<code>?</code>). User input is never concatenated directly into SQL strings. The JDBC driver treats inputs as literal data values rather than executable SQL commands, neutralizing injection attempts.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">Explain the database schema and foreign key relationships.</div>
+  <div class="qa-a">
+    The relational schema consists of 4 core tables:
+    <ul>
+      <li><code>users</code>: Primary key <code>id</code>. Stores authentication and roles.</li>
+      <li><code>products</code>: Primary key <code>id</code>, unique <code>barcode</code>. Stores prices and inventory quantities.</li>
+      <li><code>bills</code>: Primary key <code>id</code>, unique <code>bill_number</code>, foreign key <code>cashier_id REFERENCES users(id)</code>.</li>
+      <li><code>bill_items</code>: Primary key <code>id</code>, foreign key <code>bill_id REFERENCES bills(id) ON DELETE CASCADE</code>, foreign key <code>product_id REFERENCES products(id)</code>.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">How does the application handle database creation if MySQL is fresh?</div>
+  <div class="qa-a">
+    <code>DatabaseConnection.java</code> uses a two-phase connection strategy. It first connects without a database name (<code>jdbc:mysql://localhost:3306/</code>) to execute <code>CREATE DATABASE IF NOT EXISTS smart_retail</code>. It then connects directly to <code>smart_retail</code> and executes table creation scripts and initial seed data if the tables are empty.
+  </div>
+</div>
+
+<div class="page-break"></div>
+<h3>Category 3: Java Swing, UI & Event Handling</h3>
+
+<div class="qa-block">
+  <div class="qa-q">What is the Event Dispatch Thread (EDT) and why is <code>SwingUtilities.invokeLater()</code> used?</div>
+  <div class="qa-a">
+    Java Swing is <strong>single-threaded</strong> and not thread-safe. All component creation, updates, and event listeners must run on the <strong>Event Dispatch Thread (EDT)</strong>. <code>SwingUtilities.invokeLater()</code> places the UI initialization runnable at the end of the AWT event queue, preventing race conditions, UI freezing, and visual rendering glitches.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">How did you create the custom 2D Bar Chart without external libraries?</div>
+  <div class="qa-a">
+    In <code>SalesBarChartPanel</code>, the standard <code>paintComponent(Graphics g)</code> method was overridden. The <code>Graphics</code> object is cast to <code>Graphics2D</code> to enable anti-aliasing. The panel calculates the maximum revenue among the data points, normalizes each bar's height relative to the panel's pixel height, draws coordinate grid lines, and renders colored rectangles for each date using the system's Rust and Pine palette.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">How does <code>StockStatusCellRenderer</code> work for table status badges?</div>
+  <div class="qa-a">
+    It extends <code>DefaultTableCellRenderer</code>. During table painting, Swing invokes <code>getTableCellRendererComponent()</code> for every cell. The renderer inspects the stock quantity: if <code>qty &lt;= 0</code>, it renders an "OUT OF STOCK" badge in soft red; if <code>qty &lt;= minAlert</code>, it renders "LOW STOCK" in amber; otherwise, it renders "OK" in green with rounded borders and bold text.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">Which layout managers are used and why?</div>
+  <div class="qa-a">
+    A combination of layouts is used based on view requirements:
+    <ul>
+      <li><code>BorderLayout</code>: Used for dashboard roots (Top header in <code>NORTH</code>, Navigation in <code>WEST</code>, Main work area in <code>CENTER</code>).</li>
+      <li><code>CardLayout</code>: Used in <code>AdminDashboard</code> to switch between panels (Dashboard, Products, Billing, Inventory, Reports) without creating and destroying frames.</li>
+      <li><code>GridBagLayout</code>: Used for forms, login dialogs, and detail cards where precise column alignment and responsive resizing are required.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="page-break"></div>
+<h3>Category 4: Security, Business Logic & Edge Cases</h3>
+
+<div class="qa-block">
+  <div class="qa-q">How is Role-Based Access Control (RBAC) enforced in the application?</div>
+  <div class="qa-a">
+    When an operator logs in, their role (<code>ADMIN</code> or <code>CASHIER</code>) is stored in the active session. If the user is a cashier, they are routed to <code>CashierDashboard</code>, which only renders the billing screen. Administrative navigation panels (Products, Stock adjustments, Staff management, Financial reports) are not instantiated for cashiers, preventing unauthorized access.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">What happens if a cashier tries to sell more items than available in stock?</div>
+  <div class="qa-a">
+    The application protects against this at two independent levels:
+    <ol>
+      <li><strong>UI Level:</strong> <code>BillingController.addItemToCart()</code> checks if <code>requestedQuantity &gt; availableStock</code>. If so, it alerts the cashier immediately and prevents cart insertion.</li>
+      <li><strong>Database Level:</strong> Inside <code>BillDAO.createBillWithItems()</code>, before executing inserts, a live stock query re-verifies inventory. If stock is insufficient, it throws an exception and rolls back the transaction.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">How are edge cases like negative product prices or empty inputs handled?</div>
+  <div class="qa-a">
+    <code>ValidationUtil.java</code> validates all inputs before persistence:
+    <ul>
+      <li>Prices must parse to positive doubles (<code>&gt; 0</code>).</li>
+      <li>Quantities must be positive integers.</li>
+      <li>Barcodes must be non-empty alphanumeric strings.</li>
+      <li>Customer phone numbers are validated against standard format patterns.</li>
+    </ul>
+    Any validation error displays a user-friendly message and leaves the database untouched.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">How does the PDF Receipt Exporter work without iText or Apache PDFBox?</div>
+  <div class="qa-a">
+    <code>ReceiptExporter.PdfExporter</code> writes directly to a <code>FileOutputStream</code> using standard <strong>PDF 1.4 specification stream syntax</strong>. It outputs the standard PDF header (<code>%PDF-1.4</code>), Catalog object, Pages tree, Font dictionary (standard Type 1 Helvetica), and a text stream (<code>BT ... ET</code>) containing invoice details and cross-reference tables (<code>xref</code>). This creates valid, printable PDF receipts with zero external JAR dependencies.
+  </div>
+</div>
+
+<div class="qa-block">
+  <div class="qa-q">What future enhancements would you suggest for this system?</div>
+  <div class="qa-a">
+    Potential production enhancements include:
+    <ul>
+      <li>Migrating to password hashing with bcrypt or PBKDF2 with salting.</li>
+      <li>Integrating a hardware ESC/POS thermal receipt printer driver via serial/USB.</li>
+      <li>Adding barcode generation (Code128 / QR codes) for in-store printing.</li>
+      <li>Adding payment gateway APIs (e.g. UPI dynamic QR code display at checkout).</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SECTION 5: QUICK VIVA CHEATSHEET -->
+<div class="page-break"></div>
+<h2>5. Quick Viva Cheatsheet (Formulas & Key Reference)</h2>
+
+<div class="card primary">
+  <h4 style="margin-top:0;">Key Formulas Used in Code</h4>
+  <p><strong>POS Cart Calculation (BillingController):</strong></p>
+  <ul>
+    <li><code>LineItemTotal = UnitPrice × Quantity</code></li>
+    <li><code>Subtotal = Σ LineItemTotals</code></li>
+    <li><code>TaxAmount = Subtotal × 0.08 (8% GST)</code></li>
+    <li><code>GrandTotal = Subtotal + TaxAmount</code></li>
+  </ul>
+  <p><strong>Bar Chart Coordinate Mapping (SalesBarChartPanel):</strong></p>
+  <ul>
+    <li><code>BarHeight = (DayRevenue / MaxRevenue) × (ChartHeight - 60px)</code></li>
+  </ul>
+</div>
+
+<div class="card">
+  <h4 style="margin-top:0;">Essential SQL Tables & Constraints</h4>
+  <table style="margin-bottom:0;">
+    <thead>
+      <tr><th>Table</th><th>Key Columns</th><th>Constraints</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>users</code></td><td>id, username, password, role, is_active</td><td>PRIMARY KEY (id), UNIQUE (username)</td></tr>
+      <tr><td><code>products</code></td><td>id, barcode, name, cost_price, selling_price, stock_quantity</td><td>PRIMARY KEY (id), UNIQUE (barcode)</td></tr>
+      <tr><td><code>bills</code></td><td>id, bill_number, cashier_id, grand_total, payment_method</td><td>PRIMARY KEY (id), UNIQUE (bill_number), FK (cashier_id)</td></tr>
+      <tr><td><code>bill_items</code></td><td>id, bill_id, product_id, quantity, unit_price, total_price</td><td>PRIMARY KEY (id), FK (bill_id CASCADE), FK (product_id)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card accent">
+  <h4 style="margin-top:0; color:#C44900;">Default Credentials & Database Configuration</h4>
+  <table style="margin-bottom:0;">
+    <thead>
+      <tr><th>Role</th><th>Username</th><th>Password</th><th>Permissions</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Admin</strong></td><td><code>admin</code></td><td><code>admin123</code></td><td>Full back-office, catalog, inventory, users, financial reports</td></tr>
+      <tr><td><strong>Cashier</strong></td><td><code>cashier</code></td><td><code>cashier123</code></td><td>POS checkout station, cart management, receipt printing</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:8px; margin-bottom:0; font-size:8.5pt;">
+    <strong>MySQL Config (resources/db.properties):</strong> Host: <code>localhost</code> | Port: <code>3306</code> | Database: <code>smart_retail</code> | User: <code>root</code>
+  </p>
+</div>
+
+<div class="footer-note">
+  Smart Retail Inventory & Billing System • Academic Examination & Viva Technical Reference Manual
+</div>
+
+</body>
+</html>
