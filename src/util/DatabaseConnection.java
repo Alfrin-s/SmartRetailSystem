@@ -78,6 +78,36 @@ public class DatabaseConnection {
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL JDBC Driver (com.mysql.cj.jdbc.Driver) not found in classpath: " + e.getMessage(), e);
         } catch (SQLException e) {
+            // Check for Access Denied (password mismatch, e.g. XAMPP defaults to empty password)
+            if (e.getErrorCode() == 1045 || (e.getMessage() != null && e.getMessage().contains("Access denied"))) {
+                if (!dbPassword.isEmpty()) {
+                    try {
+                        Connection conn = DriverManager.getConnection(dbUrl, dbUser, "");
+                        this.dbPassword = ""; // Remember successful empty password
+                        return conn;
+                    } catch (SQLException ignored) {}
+                }
+                if (!"root".equals(dbPassword)) {
+                    try {
+                        Connection conn = DriverManager.getConnection(dbUrl, dbUser, "root");
+                        this.dbPassword = "root";
+                        return conn;
+                    } catch (SQLException ignored) {}
+                }
+                throw new SQLException("MySQL Authentication Error: Access denied for user '" + dbUser + "'.\n" +
+                        "Please check the password in 'resources/db.properties'.\n" +
+                        "(Note: In XAMPP, default password is empty; for MySQL Installer, use your chosen root password).", e);
+            }
+
+            // Check for Communications link failure (MySQL server stopped or not installed)
+            if (e.getMessage() != null && (e.getMessage().contains("Communications link failure") || (e.getSQLState() != null && e.getSQLState().startsWith("08")))) {
+                throw new SQLException("MySQL Server is NOT RUNNING on " + host + ":" + port + "!\n\n" +
+                        "How to resolve:\n" +
+                        "1. If using XAMPP: Open XAMPP Control Panel and click 'Start' next to MySQL.\n" +
+                        "2. If using MySQL Service: Start MySQL in Windows Services (or run 'net start MySQL84' / 'net start mysql').\n" +
+                        "3. Ensure MySQL port (default 3306) matches resources/db.properties.", e);
+            }
+
             throw new SQLException("Failed to connect to MySQL database '" + database + "' at " + host + ":" + port +
                     ".\nPlease ensure MySQL is running (e.g. in XAMPP or Windows Services) and check resources/db.properties.\nError: " + e.getMessage(), e);
         }
@@ -94,12 +124,31 @@ public class DatabaseConnection {
             return;
         }
 
-        // Step 1: Connect to MySQL server and ensure database exists
-        try (Connection conn = DriverManager.getConnection(serverUrl, dbUser, dbPassword);
-             Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS `" + database + "` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+        // Step 1: Connect to MySQL server and ensure database exists (try configured password, or empty for XAMPP)
+        Connection serverConn = null;
+        try {
+            serverConn = DriverManager.getConnection(serverUrl, dbUser, dbPassword);
         } catch (SQLException e) {
-            System.err.println("Notice: Could not auto-create database (it may already exist or user lacks CREATE permission): " + e.getMessage());
+            if (e.getErrorCode() == 1045 || (e.getMessage() != null && e.getMessage().contains("Access denied"))) {
+                try {
+                    serverConn = DriverManager.getConnection(serverUrl, dbUser, "");
+                    this.dbPassword = ""; // Switched to empty password (XAMPP mode)
+                    this.serverUrl = "jdbc:mysql://" + host + ":" + port + "/?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+                    this.dbUrl = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+                } catch (SQLException ignored) {}
+            }
+        }
+
+        if (serverConn != null) {
+            try (Statement stmt = serverConn.createStatement()) {
+                stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS `" + database + "` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+            } catch (SQLException e) {
+                System.err.println("Notice: Could not auto-create database: " + e.getMessage());
+            } finally {
+                try { serverConn.close(); } catch (Exception ignored) {}
+            }
+        } else {
+            System.err.println("Notice: MySQL Server is not reachable at " + host + ":" + port + ". Please ensure MySQL / XAMPP is started.");
         }
 
         // Step 2: Connect to the specific database and create tables & seed data

@@ -135,3 +135,24 @@ test.bat
 ```cmd
 run.bat
 ```
+
+---
+
+## Troubleshooting & Database Setup
+
+### "Error: Database error during authentication: Communications link failure"
+If you or someone cloning from GitHub sees this message:
+1. **Cause**: MySQL Server is **NOT running** on your computer.
+2. **Fix**:
+   - **If you use XAMPP**: Open **XAMPP Control Panel** and click **"Start"** next to **MySQL**.
+   - **If you use standalone MySQL**: Start the MySQL service in Windows Services (or run `net start mysql` in an Admin command prompt).
+3. **Password Configuration (`resources/db.properties`)**:
+   - If using **XAMPP**, MySQL root password is blank by default (`db.password=`). The system will automatically detect this and connect.
+   - If using **MySQL Community Installer**, enter the root password you created during installation:
+     ```properties
+     db.host=localhost
+     db.port=3306
+     db.database=smart_retail
+     db.user=root
+     db.password=YOUR_PASSWORD
+     ```

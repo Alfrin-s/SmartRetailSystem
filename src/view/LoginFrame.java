@@ -167,7 +167,12 @@ public class LoginFrame extends JFrame {
             }
 
         } catch (Exception ex) {
-            lblErrorMessage.setText("Error: " + ex.getMessage());
+            String msg = ex.getMessage();
+            lblErrorMessage.setText("<html><center style='color:#C44900;'><b>Database Connection Error!</b><br><span style='font-size:9px;'>Please ensure MySQL or XAMPP is running.</span></center></html>");
+            JOptionPane.showMessageDialog(this,
+                    (msg != null ? msg : "Failed to connect to MySQL database on port 3306."),
+                    "MySQL Database Connection Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }
