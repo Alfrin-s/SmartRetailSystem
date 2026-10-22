@@ -3,7 +3,10 @@ bin/
 *.class
 
 # IDE and Editor configurations
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
 .idea/
 *.iml
 *.project

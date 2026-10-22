@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Smart Retail POS",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "SmartRetailSystem"
+        },
+        {
+            "type": "java",
+            "name": "Run Verification Tests",
+            "request": "launch",
+            "mainClass": "test.SystemVerificationTest",
+            "projectName": "SmartRetailSystem"
+        }
+    ]
+}
